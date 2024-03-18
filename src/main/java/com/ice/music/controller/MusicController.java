@@ -25,13 +25,11 @@ public class MusicController {
     public ResponseEntity<TrackDTO> addTrack(@RequestBody TrackDTO trackDTO){
         TrackDTO trackDTOSaved = trackService.saveTrack(trackDTO);
         return  ResponseEntity.status(HttpStatus.CREATED).body(trackDTOSaved);
-
     }
     @PostMapping("/artists")
     public ResponseEntity<Long> addTrack(@RequestBody ArtistDTO artistDTO){
         Long artistId = artistService.saveArtist(artistDTO);
         return  ResponseEntity.status(HttpStatus.CREATED).body(artistId);
-
     }
 
     @PutMapping("artist/{artistId}")
@@ -44,13 +42,11 @@ public class MusicController {
     public ResponseEntity<List<TrackDTO>> getTracks(@PathVariable Long artistId){
      List<TrackDTO> tracklist = trackService.getAllTracks(artistId);
      return ResponseEntity.ok(tracklist);
-
     }
 
     @GetMapping("/artist-of-the-day")
     public  ResponseEntity<ArtistDTO> fetchArtistOfTheDay(){
     ArtistDTO artistDTO = artistService.fetchArtistOfTheDay();
     return  ResponseEntity.ok(artistDTO);
-
     }
 }

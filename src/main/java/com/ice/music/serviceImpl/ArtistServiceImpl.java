@@ -1,12 +1,12 @@
 package com.ice.music.serviceImpl;
 
 import com.ice.music.dto.ArtistDTO;
-import com.ice.music.dto.TrackDTO;
 import com.ice.music.entity.Artist;
-import com.ice.music.entity.Track;
 import com.ice.music.repository.ArtistRepository;
 import com.ice.music.service.ArtistService;
 import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -14,26 +14,31 @@ import java.util.Optional;
 
 @Service
 public class ArtistServiceImpl implements ArtistService {
+    private static final Logger logger = LoggerFactory.getLogger(ArtistServiceImpl.class);
 
     private final ArtistRepository artistRepository;
-
     public ArtistServiceImpl(ArtistRepository artistRepository) {
         this.artistRepository = artistRepository;
     }
 
     @Override
     public Long saveArtist(ArtistDTO artistDTO) {
+        logger.info("Saving artist: {}", artistDTO.getName());
         Artist artist = new Artist();
         artist.setName(artistDTO.getName());
         artist.setArtistOfTheDay(false);
         Artist savedArtist =  artistRepository.save(artist);
+        logger.info("Artist saved successfully with id: {}", savedArtist.getId());
         return savedArtist.getId();
     }
 
     @Override
     public String updateArtist(String newName, Long artistId) {
         Artist artist = artistRepository.findById(artistId)
-                .orElseThrow(() -> new EntityNotFoundException("Artist not found with id: " +artistId));
+                .orElseThrow(() -> {
+                    logger.error("Artist not found with id: {}", artistId);
+                    return new EntityNotFoundException("Artist not found with id: " + artistId);
+                });
         artist.setName(newName);
         artistRepository.save(artist);
         return artist.getName();
@@ -41,6 +46,7 @@ public class ArtistServiceImpl implements ArtistService {
 
     @Override
     public ArtistDTO fetchArtistOfTheDay() {
+        logger.info("Fetching artist of the day");
         Optional<Artist> artist = artistRepository.findByIsArtistOfTheDay(true);
        if( !artist.isPresent()){
            //for example if someone  calls before scheduler runs for the first time
@@ -52,7 +58,7 @@ public class ArtistServiceImpl implements ArtistService {
     }
 
     @Override
-@Transactional
+    @Transactional
     public void rotateArtistOfTheDay() {
         //find current artist of day
         Optional<Artist> currentArtist = artistRepository.findByIsArtistOfTheDay(true);
@@ -76,6 +82,7 @@ public class ArtistServiceImpl implements ArtistService {
             Optional<Artist> firstArtist = artistRepository.findFirstByOrderByIdAsc();
             firstArtist.ifPresent(artist -> artistRepository.updateIsArtistOfTheDayById(artist.getId(), true));
         }
+        logger.info("Artist of the day rotated successfully");
     }
     private ArtistDTO convertToDto(Artist artist) {
         ArtistDTO artistDTO = new ArtistDTO();
@@ -83,5 +90,4 @@ public class ArtistServiceImpl implements ArtistService {
         artistDTO.setId(artist.getId());
         return  artistDTO;
     }
-
 }

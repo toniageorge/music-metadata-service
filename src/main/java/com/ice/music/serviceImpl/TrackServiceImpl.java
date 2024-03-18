@@ -7,6 +7,8 @@ import com.ice.music.repository.ArtistRepository;
 import com.ice.music.repository.TrackRepository;
 import com.ice.music.service.TrackService;
 import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,34 +16,38 @@ import java.util.stream.Collectors;
 
 @Service
 public class TrackServiceImpl implements TrackService {
-
+    private static final Logger logger = LoggerFactory.getLogger(TrackServiceImpl.class);
     private final TrackRepository trackRepository;
     private final ArtistRepository artistRepository;
 
 
     public TrackServiceImpl(TrackRepository trackRepository, ArtistRepository artistRepository) {
-
         this.trackRepository = trackRepository;
         this.artistRepository = artistRepository;
     }
 
     @Override
     public TrackDTO saveTrack(TrackDTO trackDTO ) {
+        logger.info("Saving track: {}", trackDTO.getTitle());
         Track trackToSave = new Track();
         Artist artist = artistRepository.findById(trackDTO.getArtistId())
-                .orElseThrow(() -> new EntityNotFoundException("Artist not found with id: " + trackDTO.getArtistId()));
-
+                .orElseThrow(() -> {
+                    logger.error("Artist not found with id: {}", trackDTO.getArtistId());
+                    return new EntityNotFoundException("Artist not found with id: " + trackDTO.getArtistId());
+                });
         trackToSave.setTitle(trackDTO.getTitle());
         trackToSave.setGenre(trackDTO.getGenre());
         trackToSave.setLength(trackDTO.getLength());
         trackToSave.setArtist(artist);
         trackRepository.save(trackToSave );
+        logger.info("Track saved successfully: {}", trackDTO.getTitle());
         return convertToDto(trackToSave);
     }
 
     @Override
     public List<TrackDTO> getAllTracks(Long artistId) {
         List<Track> tracks =  trackRepository.findByArtistId(artistId);
+        logger.info("Found {} tracks for artist with id: {}", tracks.size(), artistId);
         return tracks.stream()
                 .map(track -> convertToDto(track))
                 .collect(Collectors.toList());
