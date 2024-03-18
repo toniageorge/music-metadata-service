@@ -1,5 +1,4 @@
-Music Metada service
-
+## Music Metada service
 ## Prerequisites
 
 - Java 17
@@ -75,3 +74,5 @@ The application will start at `http://localhost:8080`.
   Endpoint: GET /musics/artist-of-the-day
   Description: Retrieves the "Artist of the Day".
   Response: Returns the ArtistDTO object representing the Artist of the Day.
+  Scheduler:
+  Use Quartz Scheduler to run a daily job that selects the next artist in the cyclical rotation and updates the database accordingly.
