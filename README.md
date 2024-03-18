@@ -45,7 +45,8 @@ The application will start at `http://localhost:8080`.
    http://localhost:8080/swagger-ui/index.html#/
 
  6. **api endPoints**
-**Add a Track**
+
+ **Add a Track**
     Endpoint: POST /musics/tracks
     Request Body: TrackDTO
     Description: Adds a new track.
