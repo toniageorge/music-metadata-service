@@ -1,0 +1,124 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+paths:
+  /musics/artist/{artistId}:
+    put:
+      tags:
+        - music-controller
+      operationId: updateArtistName
+      parameters:
+        - name: artistId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: newName
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /musics/tracks:
+    post:
+      tags:
+        - music-controller
+      operationId: addTrack
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrackDTO'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TrackDTO'
+  /musics/artists:
+    post:
+      tags:
+        - music-controller
+      operationId: addTrack_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArtistDTO'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+  /musics/artists/{artistId}/tracks:
+    get:
+      tags:
+        - music-controller
+      operationId: getTracks
+      parameters:
+        - name: artistId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TrackDTO'
+  /musics/artist-of-the-day:
+    get:
+      tags:
+        - music-controller
+      operationId: fetchArtistOfTheDay
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ArtistDTO'
+components:
+  schemas:
+    TrackDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        genre:
+          type: string
+        length:
+          type: integer
+          format: int32
+        artistId:
+          type: integer
+          format: int64
+    ArtistDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
